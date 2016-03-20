@@ -1,3 +1,5 @@
+var map;
+
 window.onload = getMyLocation;
 
 function getMyLocation() {
@@ -15,6 +17,7 @@ function displayLocation(position) {
 	var div = document.getElementById("location");
 	div.innerHTML = "You are at latitude: " + latitude 
 	+ " and longitude: " + longitude;
+	div.innerHTML += " with accuracy of " + position.coords.accuracy + " meters.";
 
 	var WSHQcoords = {
 		latitude: 47.624851,
@@ -25,6 +28,15 @@ function displayLocation(position) {
 
 	div2 = document.getElementById("distance");
 	div2.innerHTML = "Distancia pro HQ da WS: " + distance;
+
+	var googleLatAndLong = new google.maps.LatLng(latitude, longitude);
+	var mapOptions = {
+		zoom: 10,
+		center: googleLatAndLong,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	showMap(position.coords);
 
 }
 
@@ -64,3 +76,42 @@ function degreesToRadians(degrees) {
 }
 
 // ------------------ End Ready Bake -----------------
+
+function showMap(coords){
+
+	var googleLatAndLong = new google.maps.LatLng(coords.latitude, coords.longitude);
+	var mapOptions = {
+		zoom: 10,
+		center: googleLatAndLong,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	var mapDiv = document.getElementById("map");
+	
+	map = new google.maps.Map(mapDiv, mapOptions);
+
+	var title = "Sua localização";
+	var content = "Você está aqui";
+	addMarker(map, googleLatAndLong, title, content);
+}
+
+function addMarker (map, latlong, title, content) {
+	var markerOptions = {
+		position: latlong,
+		map: map,
+		title: title,
+		clickable: true
+	};
+
+	var marker = new google.maps.Marker(markerOptions);
+
+	var infoWindowOptions = {
+		content: content,
+		position: latlong
+	};
+
+	var infoWindow = new google.maps.InfoWindow(infoWindowOptions);
+
+	google.maps.event.addListener(marker, "click", function() {infoWindow.open(map);});
+
+}
