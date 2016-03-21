@@ -30,6 +30,12 @@ window.onload = function() {
 										["5:00pm", "9:00pm"]);
 	alert(forbiddenPlanetMovie.getNextShowing());
 
+	var jsonString = JSON.stringify(plan9Movie);
+	alert(jsonString);
+
+	var jsonObject = JSON.parse(jsonString);
+	alert(jsonObject.title);
+
 }
 
 function Movie(title, genre, rating, showtimes) {
