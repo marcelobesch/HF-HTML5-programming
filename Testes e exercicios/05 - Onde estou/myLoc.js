@@ -1,13 +1,38 @@
 var map;
+var watchId = null;
+var prevCoords = null;
 
 window.onload = getMyLocation;
 
 function getMyLocation() {
 	if (navigator.geolocation) {
+		
 		navigator.geolocation.getCurrentPosition(displayLocation, displayError);
+
+		var watchButton = document.getElementById("watch");
+		watchButton.onclick = watchLocation;
+		var clearWatchButton = document.getElementById("clearWatch");
+		clearWatchButton.onclick = clearWatch;
 	} else {
 		alert("Oops, no geolocation support");
 	}
+}
+
+function watchLocation() {
+	watchId = navigator.geolocation.watchPosition(displayLocation, displayError);
+}
+
+function clearWatch() {
+	navigator.geolocation.clearWatch(watchId);
+	watchId = null;
+}
+
+function scrollMapToPosition(coords) {
+	var latlong = new google.maps.LatLng(coords.latitude, coords.longitude);
+
+	map.panTo(latlong);
+
+	addMarker(map, latlong, "Voce esteve aqui", "Bem aqui!");
 }
 
 function displayLocation(position) {
@@ -29,14 +54,19 @@ function displayLocation(position) {
 	div2 = document.getElementById("distance");
 	div2.innerHTML = "Distancia pro HQ da WS: " + distance;
 
-	var googleLatAndLong = new google.maps.LatLng(latitude, longitude);
-	var mapOptions = {
-		zoom: 10,
-		center: googleLatAndLong,
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
+	var meters = 0;
 
-	showMap(position.coords);
+	if (prevCoords != null) {
+		meters = computeDistance(prevCoords, position.coords) * 1000;
+	}
+
+	if (map == null) {
+		showMap(position.coords);
+		prevCoords = position.coords;
+	} else if (meters > 10) {
+		scrollMapToPosition(position.coords);
+		prevCoords = position.coords;
+	}
 
 }
 
@@ -49,6 +79,12 @@ function displayError(error) {
 	}
 	var div = document.getElementById("location");
 	div.innerHTML = errorMessage;
+
+	options.timeout += 100;
+	navigator.geolocation.getCurrentPosition(displayLocation, displayError, options);
+	div.innerHTML += "... tentando de novo com timeout = " + options.timeout + " ms";
+
+	
 }
 
 // --------------------- Ready Bake ------------------
@@ -81,7 +117,7 @@ function showMap(coords){
 
 	var googleLatAndLong = new google.maps.LatLng(coords.latitude, coords.longitude);
 	var mapOptions = {
-		zoom: 10,
+		zoom: 18,
 		center: googleLatAndLong,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
