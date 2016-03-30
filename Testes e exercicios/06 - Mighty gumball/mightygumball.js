@@ -13,9 +13,12 @@ window.onload = function () {
 
 	// request.send(null);
 
-	// Para JSONP:
-	updateSales(vendas);
+	// setInterval(refreshHandler,3000); 
 
+}
+
+function refreshHandler() {
+	alert("Oi");
 }
 
 // ComXMLHTTPRequest:
