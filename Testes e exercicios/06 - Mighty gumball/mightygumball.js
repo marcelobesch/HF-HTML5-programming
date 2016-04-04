@@ -13,12 +13,26 @@ window.onload = function () {
 
 	// request.send(null);
 
-	// setInterval(refreshHandler,3000); 
+	setInterval(refreshHandler,3000); 
 
 }
 
 function refreshHandler() {
-	alert("Oi");
+	
+	var url = "http://gumball.wickedlysmart.com?callback=updateSales";
+
+	var newScriptElement = document.createElement("script");
+	newScriptElement.setAttribute("src", url);
+	newScriptElement.setAttribute("id", "jsonp");
+
+	var oldScriptElement = document.getElementById("jsonp");
+	var head = document.getElementsByTagName("head")[0];
+	if(oldScriptElement == null) {
+		head.appendChild(newScriptElement);
+	}else{
+		head.replaceChild(newScriptElement, oldScriptElement);
+	}
+
 }
 
 // ComXMLHTTPRequest:
